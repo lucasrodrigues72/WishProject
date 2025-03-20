@@ -1,10 +1,8 @@
+// src/LoginPage.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importation de useNavigate pour la redirection
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importation de Bootstrap pour le design
-import { Routes, Route, useNavigate } from 'react-router-dom'; // Importation de Routes et Route pour gérer les routes
-import PageUne from './pageUne'; // Avec la casse correcte
 
-
-// Page de Connexion
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,10 +22,10 @@ function LoginPage() {
     });
 
     const data = await response.text();
-
+    
     if (response.status === 200) {
       setMessage('Connexion réussie');
-      navigate('/page-une'); // Rediriger vers PageUne si la connexion réussit
+      navigate('/page-une'); // Redirige vers la page après connexion réussie
     } else {
       setMessage(data); // Afficher le message d'erreur si la connexion échoue
     }
@@ -74,18 +72,4 @@ function LoginPage() {
   );
 }
 
-function App() {
-  return (
-    <div>
-      <Routes>
-        {/* Route pour la page de connexion */}
-        <Route path="/" element={<LoginPage />} />
-        
-        {/* Route pour la page après la connexion réussie */}
-        <Route path="/page-une" element={<PageUne />} />
-      </Routes>
-    </div>
-  );
-}
-
-export default App;
+export default LoginPage;

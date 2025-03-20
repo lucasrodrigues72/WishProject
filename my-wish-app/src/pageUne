@@ -1,0 +1,12 @@
+// src/PageUne.js
+import React from 'react';
+
+function PageUne() {
+  return (
+    <div>
+      <h1>Bienvenue sur PageUne!</h1>
+    </div>
+  );
+}
+
+export default PageUne;
