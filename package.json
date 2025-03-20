@@ -17,5 +17,12 @@
   "bugs": {
     "url": "https://github.com/lucasrodrigues72/WishProject/issues"
   },
+<<<<<<< HEAD
   "homepage": "https://github.com/lucasrodrigues72/WishProject#readme"
+=======
+  "homepage": "https://github.com/lucasrodrigues72/WishProject#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+>>>>>>> origin/lucas
 }
