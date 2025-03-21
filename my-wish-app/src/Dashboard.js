@@ -1,49 +1,48 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { Container, Button, Form } from "react-bootstrap";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const [wishTitle, setWishTitle] = useState("");
   const [wishes, setWishes] = useState([]);
+  const [userId, setUserId] = useState(1); // Remplace 1 par l'id de l'utilisateur connecté si tu veux le récupérer dynamiquement
 
-  // Fonction pour récupérer tous les souhaits depuis le backend
+  // Fonction pour récupérer les souhaits depuis la BDD
   const fetchWishes = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/wishes");
+      const response = await axios.get("http://localhost:3001/api/wishes", {
+        params: { id_user: userId },
+      });
       setWishes(response.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des souhaits :", error);
+      console.error(
+        "Erreur lors de la récupération des souhaits :",
+        error.message
+      );
     }
   };
 
-  // Appel de la fonction fetchWishes au chargement de la page
   useEffect(() => {
     fetchWishes();
-  }, []);
+  }, [userId]);
 
-  // Fonction de soumission du formulaire
+  // Fonction d'envoi du souhait
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!wishTitle.trim()) {
-      alert("Veuillez entrer un souhait valide.");
-      return;
-    }
-
     try {
       const response = await axios.post("http://localhost:3001/api/wishes", {
         title: wishTitle,
+        id_user: userId, // Envoi l'id de l'utilisateur connecté
       });
-
-      if (response.status === 201) {
-        alert("Souhait enregistré avec succès !");
-        setWishTitle(""); // Réinitialiser l'input
-        fetchWishes(); // Recharger la liste des souhaits
-      }
+      console.log("Réponse serveur :", response.data);
+      setWishTitle("");
+      fetchWishes(); // Rafraîchit la liste des souhaits après ajout
     } catch (error) {
-      console.error("Erreur lors de l'enregistrement du souhait :", error);
-      alert("Une erreur est survenue. Veuillez réessayer.");
+      console.error(
+        "Erreur lors de l'enregistrement du souhait :",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 
@@ -58,11 +57,12 @@ const Dashboard = () => {
           <ul>
             {wishes.map((wish) => (
               <li key={wish.id}>
-                {wish.title} - Créé le{" "}
+                {wish.title} - Fait le{" "}
                 {new Date(wish.created_at).toLocaleDateString()}
               </li>
             ))}
           </ul>
+          <Button variant="dark">SEE MORE</Button>
         </div>
         <div className="make-wish">
           <h3>MAKE A WISH</h3>

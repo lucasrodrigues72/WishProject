@@ -55,14 +55,15 @@ app.post("/login", (req, res) => {
 
 // Route pour enregistrer un souhait
 app.post("/api/wishes", (req, res) => {
-  const { title } = req.body;
+  const { title, id_user } = req.body; // On récupère l'id_user depuis le frontend
 
-  if (!title) {
-    return res.status(400).send("Le titre est requis.");
+  if (!title || !id_user) {
+    return res.status(400).send("Le titre et l'ID utilisateur sont requis.");
   }
 
-  const query = "INSERT INTO wishes (title, created_at) VALUES (?, NOW())";
-  db.execute(query, [title], (err, result) => {
+  const query =
+    "INSERT INTO wishes (title, created_at, id_user) VALUES (?, NOW(), ?)";
+  db.execute(query, [title, id_user], (err, result) => {
     if (err) {
       console.error("Erreur lors de l'insertion du souhait :", err);
       return res.status(500).send("Erreur serveur");
