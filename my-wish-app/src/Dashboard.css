@@ -1,0 +1,45 @@
+.dashboard-container {
+    background-color: #f8f6f3;
+    height: 100vh;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-header {
+    background-color: #000;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.dashboard-content {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.wish-list, .make-wish {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 45%;
+}
+
+.wish-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.wish-list li {
+    background-color: #666;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
