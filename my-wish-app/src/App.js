@@ -1,19 +1,16 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Importation de Routes et Route pour gérer les routes
-import Dashboard from './Dashboard.js';
-import LoginPage from './LoginPage.js'; // Assurez-vous que le chemin et la casse du nom du fichier sont corrects
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./Home";
+import LoginPage from "./LoginPage";
+import Dashboard from "./Dashboard";
 
 function App() {
   return (
-    <div>
-      <Routes>
-        {/* Route pour la page de connexion */}
-        <Route path="/" element={<LoginPage />} />
-        
-        {/* Route pour la page Dashboard après la connexion réussie */}
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
   );
 }
 

@@ -1,14 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';  // Importation de ReactDOM à partir de 'react-dom/client'
-import { BrowserRouter as Router } from 'react-router-dom';
-import App from './App'; // Assurez-vous que le chemin d'importation est correct
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom"; // Import correct
+import App from "./App";
 
-// Utilisation de createRoot dans React 18
-const root = ReactDOM.createRoot(document.getElementById('root'));  // Remplace 'render' par 'createRoot'
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
-  </React.StrictMode>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );
