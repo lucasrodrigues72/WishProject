@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import './LoginPage.css'; // Importation du fichier CSS
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importation de Bootstrap
 import { useNavigate } from 'react-router-dom';
-import './LoginPage.css'; // Importation du fichier CSS
 
 function LoginPage() {
   const [email, setEmail] = useState('');
