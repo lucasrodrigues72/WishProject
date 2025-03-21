@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom'; // Importation de Routes et Route pour gérer les routes
 import Dashboard from './Dashboard.js';
-import LoginPage from './loginPage.js'; // Assurez-vous que le chemin et la casse du nom du fichier sont corrects
+import LoginPage from './LoginPage.js'; // Assurez-vous que le chemin et la casse du nom du fichier sont corrects
 
 function App() {
   return (
