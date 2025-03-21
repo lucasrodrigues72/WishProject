@@ -1,7 +1,6 @@
 // server.js
 const express = require('express');
 const mysql = require('mysql2');
-const bcrypt = require('bcrypt');
 const cors = require('cors'); // Ajout du middleware CORS
 
 const app = express();
@@ -9,16 +8,16 @@ const port = 3001;
 
 // Crée une connexion à la base de données
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'root',
-  database: 'projet'
+  host: 'mysql-projetwish.alwaysdata.net',
+  user: '399526',
+  password: 'Projet13022025',
+  database: 'projetwish_projet'
 });
 
 // Connexion à la base de données
 db.connect((err) => {
   if (err) {
-    console.error('Erreur de connexion à la basex de données:', err);
+    console.error('Erreur de connexion à la base de données:', err);
     return;
   }
   console.log('Connecté à la base de données MySQL');
@@ -45,19 +44,12 @@ app.post('/login', (req, res) => {
     if (results.length > 0) {
       const user = results[0];
 
-      // Comparaison du mot de passe avec le hash stocké
-      bcrypt.compare(password, user.mdp, (err, isMatch) => {
-        if (err) {
-          console.error('Erreur lors de la comparaison des mots de passe', err);
-          return res.status(500).send('Erreur serveur');
-        }
-
-        if (isMatch) {
-          res.status(200).send('Connexion réussie');
-        } else {
-          res.status(401).send('Email ou mot de passe incorrect');
-        }
-      });
+      // Comparaison du mot de passe en texte brut
+      if (password === user.mdp) {
+        res.status(200).send('Connexion réussie');
+      } else {
+        res.status(401).send('Email ou mot de passe incorrect');
+      }
     } else {
       res.status(401).send('Email ou mot de passe incorrect');
     }
