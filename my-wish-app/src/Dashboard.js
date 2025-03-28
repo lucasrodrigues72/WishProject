@@ -213,30 +213,22 @@ const Dashboard = () => {
           </Form>
         </div>
       </div>
-
-      {/* Graphique des souhaits par mois */}
-      <div className="wish-chart">
-        <h3>Wish Distribution by Month</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="vœux" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
       
-<div className="bubbles-background">
-  <div className="bubble bubble1"></div>
-  <div className="bubble bubble2"></div>
-  <div className="bubble bubble3"></div>
-  <div className="bubble bubble4"></div>
-  <div className="bubble bubble5"></div>
-</div>
-
+      {/* Ajout du graphique */}
+      <div className="wish-chart">
+        <div className="card">
+          <h4>Statistiques des Souhaits</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="vœux" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </Container>
   );
 };
