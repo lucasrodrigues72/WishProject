@@ -1,3 +1,4 @@
+/* Dashboard CSS */
 .dashboard-container {
     background-color: #f8f6f3;
     height: 100vh;
@@ -42,4 +43,46 @@ button {
     margin-top: 10px;
     padding: 10px 20px;
     border-radius: 5px;
+}
+
+/* Bulles de fond */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #f8f6f3;
+}
+
+.bubbles-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -250px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    animation: rise 15s infinite ease-in;
+}
+
+@keyframes rise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% {
+        transform: translateY(-110vh) scale(1.2);
+        opacity: 0;
+    }
 }

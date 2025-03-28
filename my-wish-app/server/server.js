@@ -1,58 +1,121 @@
-// server.js
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors'); // Ajout du middleware CORS
+const express = require("express");
+const mysql = require("mysql2");
+const cors = require("cors");
 
 const app = express();
 const port = 3001;
 
-// Crée une connexion à la base de données
+// Connexion à la base de données MySQL
 const db = mysql.createConnection({
-  host: 'mysql-projetwish.alwaysdata.net',
-  user: '399526',
-  password: 'Projet13022025',
-  database: 'projetwish_projet'
+  host: "mysql-projetwish.alwaysdata.net",
+  user: "399526",
+  password: "Projet13022025",
+  database: "projetwish_projet",
 });
 
-// Connexion à la base de données
+// Vérifier la connexion à la base de données
 db.connect((err) => {
   if (err) {
-    console.error('Erreur de connexion à la base de données:', err);
+    console.error("Erreur de connexion à la base de données:", err);
     return;
   }
-  console.log('Connecté à la base de données MySQL');
+  console.log("Connecté à la base de données MySQL");
 });
 
-// Middleware pour parser les requêtes JSON
+// Middleware
 app.use(express.json());
-
-// Middleware CORS pour permettre les requêtes entre différentes origines
 app.use(cors());
 
-// Route de connexion
-app.post('/login', (req, res) => {
+// Route d'inscription (Création de compte)
+app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
-  // Recherche l'utilisateur par email
-  const query = 'SELECT * FROM user WHERE email = ?';  // Assurez-vous que vous utilisez la bonne table 'user' et le bon champ 'mdp'
+  if (!email || !password) {
+    return res.status(400).send("Email et mot de passe requis.");
+  }
+
+  // Vérifier si l'email existe déjà
+  const checkQuery = "SELECT * FROM user WHERE email = ?";
+  db.execute(checkQuery, [email], (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la vérification de l'utilisateur :", err);
+      return res.status(500).send("Erreur serveur");
+    }
+
+    if (results.length > 0) {
+      return res.status(400).send("Cet email est déjà utilisé.");
+    }
+
+    // Insérer l'utilisateur
+    const insertQuery = "INSERT INTO user (email, mdp) VALUES (?, ?)";
+    db.execute(insertQuery, [email, password], (err, result) => {
+      if (err) {
+        console.error("Erreur lors de l'inscription :", err);
+        return res.status(500).send("Erreur serveur");
+      }
+      res.status(201).send("Compte créé avec succès !");
+    });
+  });
+});
+
+// Route de connexion
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  const query = "SELECT * FROM user WHERE email = ?";
   db.execute(query, [email], (err, results) => {
     if (err) {
-      console.error('Erreur lors de l\'exécution de la requête', err);
-      return res.status(500).send('Erreur serveur');
+      console.error("Erreur lors de l'exécution de la requête", err);
+      return res.status(500).send("Erreur serveur");
     }
 
     if (results.length > 0) {
       const user = results[0];
 
-      // Comparaison du mot de passe en texte brut
+      // Vérifier si le mot de passe est correct
       if (password === user.mdp) {
-        res.status(200).send('Connexion réussie');
+        res.status(200).send("Connexion réussie");
       } else {
-        res.status(401).send('Email ou mot de passe incorrect');
+        res.status(401).send("Email ou mot de passe incorrect");
       }
     } else {
-      res.status(401).send('Email ou mot de passe incorrect');
+      res.status(401).send("Email ou mot de passe incorrect");
     }
+  });
+});
+
+// Route pour enregistrer un souhait
+app.post("/api/wishes", (req, res) => {
+  const { title, target_date, id_user } = req.body;
+
+  if (!title || !id_user || !target_date) {
+    return res
+      .status(400)
+      .send("Le titre, l'ID utilisateur et la date sont requis.");
+  }
+
+  const query =
+    "INSERT INTO wishes (title, target_date, created_at, id_user) VALUES (?, ?, NOW(), ?)";
+  db.execute(query, [title, target_date, id_user], (err, result) => {
+    if (err) {
+      console.error("Erreur lors de l'insertion du souhait :", err);
+      return res.status(500).send("Erreur serveur");
+    }
+
+    res.status(201).send("Souhait enregistré avec succès.");
+  });
+});
+
+// Route pour récupérer tous les souhaits
+app.get("/api/wishes", (req, res) => {
+  const query = "SELECT * FROM wishes ORDER BY created_at DESC";
+  db.execute(query, (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la récupération des souhaits :", err);
+      return res.status(500).send("Erreur serveur");
+    }
+
+    res.status(200).json(results);
   });
 });
 
