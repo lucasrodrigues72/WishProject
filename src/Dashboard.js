@@ -1,50 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Container, Button, Form, Navbar, Nav, InputGroup,
   Row, Col, Card
-} from 'react-bootstrap';
-import { Calendar } from 'react-bootstrap-icons';
+} from "react-bootstrap";
+import { Calendar } from "react-bootstrap-icons";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
-import './Dashboard.css';
+} from "recharts";
+import axios from "axios";
+import "./Dashboard.css";
 
 const Dashboard = () => {
-  const [wishTitle, setWishTitle] = useState('');
-  const [wishDate, setWishDate] = useState('');
+  const [wishTitle, setWishTitle] = useState("");
+  const [wishDate, setWishDate] = useState("");
+  const [wishes, setWishes] = useState([]);
   const [expanded, setExpanded] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const userId = 1; // à remplacer par l'ID de l'utilisateur connecté
 
-  const wishes = [
-    "Souhait 1 - Fait le 01/01/2025",
-    "Souhait 2 - Fait le 02/01/2025",
-    "Souhait 3 - Fait le 03/03/2025",
-    "Souhait 4 - Fait le 17/03/2025",
-    "Souhait 5 - Fait le 21/06/2025",
-  ];
+  // 🔄 Récupérer les vœux via API
+  const fetchWishes = useCallback(async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/wishes", {
+        params: { id_user: userId },
+      });
+      setWishes(response.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des souhaits :", error.message);
+    }
+  }, [userId]);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    fetchWishes();
+  }, [fetchWishes]);
+
+  // 📤 Soumission d'un vœux
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (wishTitle.trim() && wishDate) {
-      alert(`Vœux créé pour le ${wishDate}`);
-      setWishTitle('');
-      setWishDate('');
-    } else {
+
+    if (!wishTitle || !wishDate) {
       alert("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:3001/api/wishes", {
+        title: wishTitle,
+        target_date: wishDate,
+        id_user: userId,
+      });
+      setWishTitle("");
+      setWishDate("");
+      fetchWishes();
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement du souhait :", error.response?.data || error.message);
     }
   };
 
-  const displayedWishes = expanded ? wishes : wishes.slice(-3);
+  const handleMonthChange = (e) => {
+    setSelectedMonth(e.target.value);
+  };
 
-  // ✅ Calcul des vœux par mois
+  // 📅 Filtrage par mois
+  const filteredWishes = selectedMonth
+    ? wishes.filter(
+        (wish) => new Date(wish.target_date).getMonth() + 1 === parseInt(selectedMonth)
+      )
+    : wishes;
+
+  const displayedWishes = expanded ? filteredWishes : filteredWishes.slice(-3);
+
+  // 📊 Générer données pour graphique
   const wishCountsByMonth = Array(12).fill(0);
   wishes.forEach(wish => {
-    const match = wish.match(/Fait le (\d{2})\/(\d{2})\/(\d{4})/);
-    if (match) {
-      const month = parseInt(match[2], 10) - 1;
-      if (month >= 0 && month < 12) {
-        wishCountsByMonth[month]++;
-      }
-    }
+    const date = new Date(wish.target_date);
+    const month = date.getMonth();
+    wishCountsByMonth[month]++;
   });
 
   const chartData = [
@@ -91,14 +122,32 @@ const Dashboard = () => {
           <Col md={6}>
             <div className={`wish-list p-4 rounded bg-dark text-white h-100`}>
               <h3 className="mb-4">Liste des vœux</h3>
+
+              <Form.Group controlId="filterByMonth" className="mb-3">
+                <Form.Select value={selectedMonth} onChange={handleMonthChange}>
+                  <option value="">Tous les mois</option>
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i} value={i + 1}>
+                      {new Date(0, i).toLocaleString("fr-FR", { month: "long" })}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
               <ul className="ps-3">
-                {displayedWishes.map((wish, index) => (
-                  <li key={index} className="mb-2">{wish}</li>
+                {displayedWishes.map((wish) => (
+                  <li key={wish.id} className="mb-2">
+                    {wish.title} — Rentré :{" "}
+                    {new Date(wish.created_at).toLocaleDateString()} — Réalisation :{" "}
+                    {new Date(wish.target_date).toLocaleDateString()}
+                  </li>
                 ))}
               </ul>
-              <Button variant="light" onClick={() => setExpanded(!expanded)}>
-                {expanded ? 'Voir moins' : 'Voir plus'}
-              </Button>
+              {filteredWishes.length > 3 && (
+                <Button variant="light" onClick={() => setExpanded(!expanded)}>
+                  {expanded ? "Voir moins" : "Voir plus"}
+                </Button>
+              )}
             </div>
           </Col>
 
@@ -130,13 +179,15 @@ const Dashboard = () => {
                   </InputGroup>
                 </Form.Group>
 
-                <Button variant="secondary" type="submit">Créer le vœux</Button>
+                <Button variant="secondary" type="submit">
+                  Créer le vœux
+                </Button>
               </Form>
             </div>
           </Col>
         </Row>
 
-        {/* ✅ Carte Graphique */}
+        {/* 📊 Graphique */}
         <Card className="p-4 mt-4">
           <h4 className="mb-3">Statistiques des vœux par mois</h4>
           <ResponsiveContainer width="100%" height={300}>
