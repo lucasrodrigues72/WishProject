@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Container, Button, Form } from "react-bootstrap";
-import 'bootstrap-icons/font/bootstrap-icons.css'; // Assurez-vous que les icônes sont importées
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -14,6 +15,7 @@ const Dashboard = () => {
   const [editWishTitle, setEditWishTitle] = useState(""); // Titre du vœu à éditer
   const [editWishDate, setEditWishDate] = useState(""); // Date du vœu à éditer
 
+  // Fonction pour récupérer les souhaits depuis l'API
   const fetchWishes = useCallback(async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/wishes", {
@@ -25,10 +27,12 @@ const Dashboard = () => {
     }
   }, [userId]);
 
+  // Charger les souhaits lors du montage du composant
   useEffect(() => {
     fetchWishes();
   }, [fetchWishes]);
 
+  // Soumettre un nouveau souhait
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -52,20 +56,20 @@ const Dashboard = () => {
     }
   };
 
+  // Filtrer les souhaits par mois sélectionné
   const handleMonthChange = (e) => {
     setSelectedMonth(e.target.value);
   };
 
-  // Filtrer les souhaits par mois sélectionné
   const filteredWishes = selectedMonth
     ? wishes.filter(
         (wish) => new Date(wish.target_date).getMonth() + 1 === parseInt(selectedMonth)
       )
     : wishes;
 
-  // Fonction d'édition
+  // Fonction pour éditer un vœu
   const handleEdit = (wishId) => {
-    const wishToEdit = wishes.find((wish) => wish.id === wishId);
+    const wishToEdit = wishes.find((wish) => wish.wishes_id === wishId);
     if (wishToEdit) {
       setEditWishId(wishId);
       setEditWishTitle(wishToEdit.title);
@@ -73,7 +77,7 @@ const Dashboard = () => {
     }
   };
 
-  // Soumettre l'édition du vœu
+  // Soumettre l'édition d'un vœu
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
 
@@ -86,10 +90,8 @@ const Dashboard = () => {
       await axios.put(`http://localhost:3001/api/wishes/${editWishId}`, {
         title: editWishTitle,
         target_date: editWishDate,
-        id_user: userId,
       });
 
-      // Réinitialiser les champs d'édition et mettre à jour la liste des souhaits
       setEditWishId(null);
       setEditWishTitle("");
       setEditWishDate("");
@@ -101,37 +103,41 @@ const Dashboard = () => {
 
   // Fonction de suppression d'un vœu
   const handleDelete = async (wishId) => {
+    const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer ce souhait ?");
+    if (!confirmDelete) return;
+
+    if (!wishId) {
+      console.error("ID du vœu manquant");
+      return;
+    }
+
     try {
+      console.log(`Deleting wish with ID: ${wishId}`);
       await axios.delete(`http://localhost:3001/api/wishes/${wishId}`);
-      fetchWishes(); // Actualiser la liste après la suppression
+      fetchWishes();
     } catch (error) {
-      console.error("Erreur lors de la suppression du souhait :", error.message);
+      console.error("Erreur lors de la suppression du souhait :", error.response?.data || error.message);
     }
   };
 
+  // Données du graphique (comptage des vœux par mois)
+  const chartData = [
+    { name: 'Janvier', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 0).length },
+    { name: 'Février', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 1).length },
+    { name: 'Mars', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 2).length },
+    { name: 'Avril', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 3).length },
+    { name: 'Mai', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 4).length },
+    { name: 'Juin', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 5).length },
+    { name: 'Juillet', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 6).length },
+    { name: 'Août', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 7).length },
+    { name: 'Septembre', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 8).length },
+    { name: 'Octobre', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 9).length },
+    { name: 'Novembre', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 10).length },
+    { name: 'Décembre', vœux: filteredWishes.filter(wish => new Date(wish.target_date).getMonth() === 11).length },
+  ];
+
   return (
     <Container className="dashboard-container">
-      {/* Ajout du fond avec les bulles */}
-      <div className="bubbles-background">
-        {/* Génère des bulles */}
-        {[...Array(10)].map((_, index) => (
-          <div
-            key={index}
-            className="bubble"
-            style={{
-              width: `${Math.random() * 50 + 20}px`,
-              height: `${Math.random() * 50 + 20}px`,
-              left: `${Math.random() * 100}vw`,
-              animationDuration: `${Math.random() * 10 + 10}s`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          ></div>
-        ))}
-      </div>
-
-      <header className="dashboard-header">
-        <h2>Wishes</h2>
-      </header>
       <div className="dashboard-content">
         <div className="wish-list">
           <h3>MY CURRENT WISH LIST</h3>
@@ -154,35 +160,25 @@ const Dashboard = () => {
           </Form.Group>
           <ul>
             {filteredWishes.map((wish) => (
-              <li key={wish.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {/* Affichage du titre et des dates */}
+              <li key={wish.wishes_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  {wish.title} - Rentrer:{" "}
-                  {new Date(wish.created_at).toLocaleDateString()} - Réalise:
+                  {wish.title} - Rentrer: {new Date(wish.created_at).toLocaleDateString()} - Réalise:
                   {new Date(wish.target_date).toLocaleDateString()}
                 </div>
-
-                {/* Conteneur pour les icônes à droite */}
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  {/* Icône du crayon pour éditer */}
-                  <i 
-                    className="bi bi-pencil" 
-                    style={{
-                      fontSize: '18px', 
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => handleEdit(wish.id)} // Gestionnaire de clic pour modifier le vœu
+                  <i
+                    className="bi bi-pencil"
+                    style={{ fontSize: '18px', cursor: 'pointer' }}
+                    onClick={() => handleEdit(wish.wishes_id)}
                   ></i>
-
-                  {/* Icône de la poubelle pour supprimer */}
-                  <i 
-                    className="bi bi-trash" 
+                  <i
+                    className="bi bi-trash"
                     style={{
-                      fontSize: '18px', 
-                      cursor: 'pointer', 
-                      color: 'red'
+                      fontSize: '18px',
+                      cursor: 'pointer',
+                      color: 'red',
                     }}
-                    onClick={() => handleDelete(wish.id)} // Gestionnaire de clic pour supprimer le vœu
+                    onClick={() => handleDelete(wish.wishes_id)} // Modifié pour utiliser "wish.wishes_id"
                   ></i>
                 </div>
               </li>
@@ -191,7 +187,7 @@ const Dashboard = () => {
           <Button variant="dark">SEE MORE</Button>
         </div>
 
-        {/* Formulaire pour créer un vœu */}
+        {/* Formulaire pour créer un souhait */}
         <div className="make-wish">
           <h3>MAKE A WISH</h3>
           <Form onSubmit={handleSubmit}>
@@ -216,34 +212,31 @@ const Dashboard = () => {
             </Button>
           </Form>
         </div>
-
-        {/* Formulaire pour éditer un vœu */}
-        {editWishId && (
-          <div className="edit-wish">
-            <h3>Edit Wish</h3>
-            <Form onSubmit={handleSubmitEdit}>
-              <Form.Group controlId="editWishTitle" className="mb-3">
-                <Form.Control
-                  type="text"
-                  value={editWishTitle}
-                  onChange={(e) => setEditWishTitle(e.target.value)}
-                />
-              </Form.Group>
-              <Form.Group controlId="editWishDate" className="mb-3">
-                <Form.Label>Date à réaliser</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={editWishDate}
-                  onChange={(e) => setEditWishDate(e.target.value)}
-                />
-              </Form.Group>
-              <Button variant="secondary" type="submit">
-                Update Wish
-              </Button>
-            </Form>
-          </div>
-        )}
       </div>
+
+      {/* Graphique des souhaits par mois */}
+      <div className="wish-chart">
+        <h3>Wish Distribution by Month</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="vœux" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      
+<div className="bubbles-background">
+  <div className="bubble bubble1"></div>
+  <div className="bubble bubble2"></div>
+  <div className="bubble bubble3"></div>
+  <div className="bubble bubble4"></div>
+  <div className="bubble bubble5"></div>
+</div>
+
     </Container>
   );
 };

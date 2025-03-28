@@ -1,68 +1,23 @@
-/* Dashboard CSS */
-.dashboard-container {
-    background-color: #f8f6f3;
-    height: 100vh;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-}
-
-.dashboard-header {
-    background-color: #000;
-    color: white;
-    padding: 10px;
-    text-align: left;
-}
-
-.dashboard-content {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.wish-list, .make-wish {
-    background-color: #222;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 45%;
-}
-
-.wish-list ul {
-    list-style: none;
-    padding: 0;
-}
-
-.wish-list li {
-    background-color: #666;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-}
-
-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    border-radius: 5px;
-}
-
-/* Bulles de fond */
-
+/* Styles Globaux */
 body, html {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
     background-color: #f8f6f3;
+    font-family: 'Arial', sans-serif;
+    height: 100%;
+    position: relative;
 }
 
+/* Fond des Bulles */
 .bubbles-background {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1;
+    z-index: -1; /* S'assurer que les bulles restent en arrière-plan */
     overflow: hidden;
-    pointer-events: none;
 }
 
 .bubble {
@@ -84,5 +39,126 @@ body, html {
     100% {
         transform: translateY(-110vh) scale(1.2);
         opacity: 0;
+    }
+}
+
+/* Container du Dashboard */
+.dashboard-container {
+    background-color: #f8f6f3;
+    height: 100vh;
+    padding: 40px;
+    font-family: Arial, sans-serif;
+}
+
+/* Header du Dashboard */
+.dashboard-header {
+    background-color: #222;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar-brand, .logout-button {
+    color: white;
+}
+
+.navbar-toggle {
+    background-color: #ddd;
+}
+
+/* Contenu Principal */
+.dashboard-content {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.wish-chart {
+    margin-top: 20px; /* Espacement entre les sections */
+}
+
+.dashboard-content > div {
+    margin-bottom: 30px; /* Espacement entre les sections */
+}
+
+.wish-list, .make-wish {
+    width: 48%; /* Ajuster les largeurs pour être côte à côte */
+}
+
+.wish-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.wish-list li {
+    background-color: #444; /* Couleur de fond des vœux (plus claire que le noir) */
+    color: white; /* Texte en blanc pour plus de lisibilité */
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wish-list i {
+    cursor: pointer;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+/* Card avec Graphique */
+.card {
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.card h4 {
+    font-size: 1.5rem;
+}
+
+/* Formulaires */
+form input, form select, form button {
+    margin-top: 10px;
+}
+
+form input[type="text"], form select, form button {
+    border-radius: 5px;
+}
+
+form button {
+    background-color: #8884d8;
+    color: white;
+}
+
+.wish-list i {
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 10px;
+    color: red;
+}
+
+/* Mise en Page Responsive */
+@media (max-width: 768px) {
+    .dashboard-content {
+        flex-direction: column;
+    }
+
+    .wish-list, .make-wish {
+        width: 100%;
+        margin-bottom: 20px;
     }
 }
